@@ -31,6 +31,41 @@ const Tasks = () => {
       status: "toDo",
     },
     {
+      id: 5,
+      name: "Work",
+      status: "toDo",
+    },
+    {
+      id: 5,
+      name: "Work",
+      status: "toDo",
+    },
+    {
+      id: 5,
+      name: "Work",
+      status: "toDo",
+    },
+    {
+      id: 5,
+      name: "Work",
+      status: "toDo",
+    },
+    {
+      id: 5,
+      name: "Work",
+      status: "toDo",
+    },
+    {
+      id: 5,
+      name: "Work",
+      status: "toDo",
+    },
+    {
+      id: 5,
+      name: "Work",
+      status: "toDo",
+    },
+    {
       id: 6,
       name: "Walking",
       status: "toDo",
@@ -46,7 +81,7 @@ const Tasks = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mx-4">
+      <div className="grid grid-cols-3 gap-4 mx-4 mb-4">
         {statuses.map((status, i) => (
           <SingleBlock status={status} tasks={tasks} key={i} />
         ))}
@@ -56,7 +91,7 @@ const Tasks = () => {
 };
 //! Single Block -----------------------
 const SingleBlock = ({ status, tasks }) => {
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [, drop] = useDrop(() => ({
     accept: "task",
     drop: (item) => addItemToSection(item.id),
     collect: (monitor) => ({
@@ -69,16 +104,26 @@ const SingleBlock = ({ status, tasks }) => {
     console.log("Dropped - ", id, status);
   };
   return (
-    <div ref={drop} className="border border-primary min-h-52">
-      <p className="text-center bg-primary text-white py-2 font-semibold">
+    <div ref={drop} className="">
+      <p
+        className={`text-center text-white py-2 font-semibold ${
+          status == "toDo"
+            ? "bg-green-600"
+            : status == "onGoing"
+            ? "bg-yellow-600"
+            : "bg-blue-600"
+        }`}
+      >
         {camelCaseToCapitalized(status)}
       </p>
       {/*  */}
-      {tasks
-        .filter((t) => t.status == status)
-        .map((task, i) => (
-          <SingleTask key={i} task={task} />
-        ))}
+      <div className="border border-primary border-t-0 overflow-y-scroll h-[380px]">
+        {tasks
+          .filter((t) => t.status == status)
+          .map((task, i) => (
+            <SingleTask key={i} task={task} />
+          ))}
+      </div>
       {/*  */}
     </div>
   );

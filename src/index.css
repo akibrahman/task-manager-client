@@ -27,3 +27,17 @@ body {
   transition-duration: 300ms;
   transition-timing-function: ease-in-out;
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #162c46;
+  /* border-radius: 20px; */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #091d36;
+}

@@ -6,7 +6,7 @@ import { NavLink } from "react-router-dom";
 const SideBar = ({ isOpen, setIsOpen }) => {
   return (
     <div
-      className={`bg-primary border-t h-full transition-all text-white pointer-events-none w-full select-none`}
+      className={`bg-primary border-y h-full transition-all text-white pointer-events-none w-full select-none`}
     >
       <div className="flex flex-col items-center mt-6">
         {isOpen ? (

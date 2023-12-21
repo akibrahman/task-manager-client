@@ -6,11 +6,7 @@ const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div onClick={() => console.log("ok")} className="h-full relative flex">
-      <div
-        className={`${
-          isOpen ? "w-[220px]" : "w-[60px]"
-        }  h-full transition-all`}
-      >
+      <div className={`${isOpen ? "w-[220px]" : "w-[60px]"}   transition-all`}>
         <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
       </div>
 
