@@ -1,7 +1,13 @@
+import { Outlet } from "react-router-dom";
+import NavBar from "./Components/NavBar";
+
 function App() {
   return (
     <>
-      <p className="text-red-700">Akib</p>
+      <NavBar />
+      <div className="h-[calc(100vh-70px)] min-h-[calc(100vh-70px)]">
+        <Outlet />
+      </div>
     </>
   );
 }
