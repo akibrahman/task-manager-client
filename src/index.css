@@ -6,3 +6,24 @@
 body {
   font-family: "Poppins", sans-serif;
 }
+.active {
+  position: relative;
+}
+.active > div {
+  background-color: #091d36;
+}
+.active > p::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 3px;
+  background-color: #fff;
+}
+.add:hover > svg {
+  rotate: 180deg;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out;
+}

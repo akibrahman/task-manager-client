@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Container from "./Container";
 
 const NavBar = () => {
@@ -8,9 +8,12 @@ const NavBar = () => {
         <div className="flex items-center justify-between py-3 text-white">
           <div className="text-xl">Task Manager</div>
           <div className="flex items-center gap-6">
-            <p>Home</p>
-            <p>About</p>
-            <p>Blog</p>
+            <NavLink to="/">
+              <p>Home</p>
+            </NavLink>
+            <NavLink to="/about">
+              <p>About</p>
+            </NavLink>
           </div>
           <Link to="/dashboard">
             <div className="flex items-center gap-3 border px-2 py-1 rounded-full">
