@@ -23,7 +23,7 @@ const NavBar = () => {
               <div className="flex items-center gap-3 border px-2 py-1 rounded-full">
                 <img
                   className="w-8 h-8 rounded-full"
-                  src="https://i.ibb.co/FKF7Cpg/Linkdin.jpg"
+                  src={user.photoURL}
                   alt=""
                 />
                 <p>Dashboard</p>

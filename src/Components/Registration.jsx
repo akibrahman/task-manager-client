@@ -1,12 +1,35 @@
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { imageUploader } from "../Utils/imageUploader";
+import { AuthContext } from "./AuthProvider";
 
 const Registration = () => {
+  const navigate = useNavigate();
+  const { registration, update } = useContext(AuthContext);
+  const [photoFile, setPhotoFile] = useState(null);
+
+  const handleRegistration = async (event) => {
+    event.preventDefault();
+    const form = event.target;
+    if (!photoFile) {
+      alert("Photo is Required");
+      return;
+    }
+    try {
+      const url = await imageUploader(photoFile);
+      await registration(form.email.value, form.password.value);
+      await update(form.name.value, url.display_url);
+      navigate("/dashboard/profile");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="flex bg-gray-100 h-[90%]">
         <div className="w-1/2 bg-white p-10 border border-primary">
           <h1 className="text-2xl font-semibold mb-5">Registration</h1>
-          <form>
+          <form onSubmit={handleRegistration}>
             <div className="mb-4">
               <label
                 htmlFor="email"
@@ -15,8 +38,9 @@ const Registration = () => {
                 Name
               </label>
               <input
-                type="email"
-                id="email"
+                required
+                type="text"
+                name="name"
                 className="w-full border rounded-md p-2"
                 placeholder="Enter your Name"
               />
@@ -30,8 +54,9 @@ const Registration = () => {
                 Email
               </label>
               <input
+                required
                 type="email"
-                id="email"
+                name="email"
                 className="w-full border rounded-md p-2"
                 placeholder="Enter your email"
               />
@@ -45,10 +70,12 @@ const Registration = () => {
                 Photo
               </label>
               <input
+                required
+                onChange={(e) => setPhotoFile(e.target.files[0])}
+                accept=".jpg, .jpeg, .png, .webp"
                 type="file"
-                id="email"
+                name="file"
                 className="w-full border rounded-md p-2"
-                placeholder="Enter your email"
               />
             </div>
 
@@ -61,7 +88,8 @@ const Registration = () => {
               </label>
               <input
                 type="password"
-                id="password"
+                name="password"
+                required
                 className="w-full border rounded-md p-2"
                 placeholder="Enter your password"
               />

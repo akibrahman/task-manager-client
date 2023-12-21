@@ -1,12 +1,26 @@
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "./AuthProvider";
 
 const Login = () => {
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      await login(event.target.email.value, event.target.password.value);
+      navigate("/dashboard/profile");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="flex bg-gray-100 h-[90%]">
         <div className="w-1/2 bg-white p-10 border border-primary">
           <h1 className="text-2xl font-semibold mb-5">Login</h1>
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="mb-4">
               <label
                 htmlFor="email"
@@ -15,8 +29,9 @@ const Login = () => {
                 Email
               </label>
               <input
+                required
                 type="email"
-                id="email"
+                name="email"
                 className="w-full border rounded-md p-2"
                 placeholder="Enter your email"
               />
@@ -29,8 +44,9 @@ const Login = () => {
                 Password
               </label>
               <input
+                required
                 type="password"
-                id="password"
+                name="password"
                 className="w-full border rounded-md p-2"
                 placeholder="Enter your password"
               />
