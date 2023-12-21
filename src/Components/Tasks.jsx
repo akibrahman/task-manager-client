@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { useForm } from "react-hook-form";
@@ -5,94 +6,51 @@ import { FaPlus, FaTimes } from "react-icons/fa";
 import Modal from "react-modal";
 import useAxios from "../Hooks/useAxios";
 import { camelCaseToCapitalized } from "../Utils/camelCaseToCapitalized";
+import Loader from "./Loader";
 
 const Tasks = () => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [deadline, setDeadline] = useState();
   const axiosInstance = useAxios();
   const statuses = ["toDo", "onGoing", "completed"];
-  const tasks = [
-    {
-      id: 1,
-      name: "Gosol",
-      status: "completed",
+
+  const {
+    data: tasks,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: async () => {
+      const data = await axiosInstance.get("/get-tasks");
+      return data.data;
     },
-    {
-      id: 2,
-      name: "Namaj",
-      status: "completed",
-    },
-    {
-      id: 3,
-      name: "Lunch",
-      status: "completed",
-    },
-    {
-      id: 4,
-      name: "Rest",
-      status: "completed",
-    },
-    {
-      id: 5,
-      name: "Work",
-      status: "toDo",
-    },
-    {
-      id: 5,
-      name: "Work",
-      status: "toDo",
-    },
-    {
-      id: 5,
-      name: "Work",
-      status: "toDo",
-    },
-    {
-      id: 5,
-      name: "Work",
-      status: "toDo",
-    },
-    {
-      id: 5,
-      name: "Work",
-      status: "toDo",
-    },
-    {
-      id: 5,
-      name: "Work",
-      status: "toDo",
-    },
-    {
-      id: 5,
-      name: "Work",
-      status: "toDo",
-    },
-    {
-      id: 5,
-      name: "Work",
-      status: "onGoing",
-    },
-    {
-      id: 6,
-      name: "Walking",
-      status: "toDo",
-    },
-  ];
+  });
+
   //!
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
   const taskAdder = async (data) => {
     console.log(data);
     try {
-      const res = await axiosInstance.post("/task", data);
-      console.log(res);
+      await axiosInstance.post("/add-task", data);
+      reset();
+      closeModal();
+      setDeadline(null);
+      refetch();
     } catch (error) {
       console.log(error);
     }
   };
+
+  const addTaskToSection = (id, status) => {
+    console.log("Dropped - ", id, status);
+  };
+
   const openModal = () => {
     setIsOpen(true);
   };
@@ -113,6 +71,7 @@ const Tasks = () => {
     },
   };
 
+  if (isLoading) return <Loader />;
   return (
     <>
       <Modal
@@ -215,26 +174,29 @@ const Tasks = () => {
 
       <div className="grid grid-cols-3 gap-4 mx-4 mb-4">
         {statuses.map((status, i) => (
-          <SingleBlock status={status} tasks={tasks} key={i} />
+          <SingleBlock
+            status={status}
+            fun={addTaskToSection}
+            tasks={tasks}
+            key={i}
+          />
         ))}
       </div>
     </>
   );
 };
 //! Single Block -----------------------
-const SingleBlock = ({ status, tasks }) => {
+const SingleBlock = ({ status, tasks, fun }) => {
   const [, drop] = useDrop(() => ({
     accept: "task",
-    drop: (item) => addItemToSection(item.id),
+    drop: (item) => fun(item.id, status),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
   }));
 
   //!
-  const addItemToSection = (id) => {
-    console.log("Dropped - ", id, status);
-  };
+
   return (
     <div ref={drop} className="">
       <p
@@ -267,7 +229,7 @@ const SingleBlock = ({ status, tasks }) => {
 const SingleTask = ({ task }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "task",
-    item: { id: task.id },
+    item: { id: task._id },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -279,7 +241,7 @@ const SingleTask = ({ task }) => {
       className={`p-2 cursor-grab ${isDragging ? "opacity-25" : "opacity-100"}`}
     >
       <p className="pl-5 text-primary py-2 font-semibold border border-primary">
-        Task - {task.name}
+        {task.title}
       </p>
     </div>
   );
