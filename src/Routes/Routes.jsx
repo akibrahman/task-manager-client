@@ -6,6 +6,7 @@ import Registration from "../Components/Registration";
 import Tasks from "../Components/Tasks";
 import Dashboard from "../Pages/Dashboard/Dashboard";
 import LandingPage from "../Pages/LandingPage/LandingPage";
+import PrivateRoute from "./PrivateRoute";
 
 export const routes = createBrowserRouter([
   {
@@ -18,15 +19,27 @@ export const routes = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: <Dashboard />,
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
         children: [
           {
             path: "profile",
-            element: <Profile />,
+            element: (
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            ),
           },
           {
             path: "tasks",
-            element: <Tasks />,
+            element: (
+              <PrivateRoute>
+                <Tasks />
+              </PrivateRoute>
+            ),
           },
         ],
       },

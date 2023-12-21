@@ -5,7 +5,7 @@ import SideBar from "../../Components/SideBar";
 const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div onClick={() => console.log("ok")} className="h-full relative flex">
+    <div className="relative flex h-full">
       <div className={`${isOpen ? "w-[220px]" : "w-[60px]"}   transition-all`}>
         <SideBar isOpen={isOpen} setIsOpen={setIsOpen} />
       </div>
