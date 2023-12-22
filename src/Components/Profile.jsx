@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { toast } from "react-toastify";
 import useUser from "../Hooks/useUser";
 import { AuthContext } from "./AuthProvider";
 import Loader from "./Loader";
@@ -12,7 +13,7 @@ const Profile = () => {
       <p className="text-6xl mb-14">Profile</p>
       <div className="flex flex-col lg:flex-row items-center gap-10">
         <img
-          src={user.photo}
+          src={user?.photo}
           className="w-[300px] h-[300px] rounded-full"
           alt=""
         />
@@ -20,17 +21,20 @@ const Profile = () => {
           <p className="font-bold">
             Name:{" "}
             <span className="font-medium text-white bg-primary px-5 py-2 rounded-md">
-              {user.name}
+              {user?.name}
             </span>
           </p>
           <p className="font-bold">
             E-mail:{" "}
             <span className="font-medium text-white bg-primary px-5 py-2 rounded-md">
-              {user.email}
+              {user?.email}
             </span>
           </p>
           <button
-            onClick={() => logout()}
+            onClick={async () => {
+              await logout();
+              toast.success("Logout");
+            }}
             className="bg-red-600 text-white px-3 py-1 rounded-md active:scale-90 duration-300"
           >
             Logout

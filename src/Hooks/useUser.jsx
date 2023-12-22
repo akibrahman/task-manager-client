@@ -12,9 +12,9 @@ const useUser = () => {
     refetch,
   } = useQuery({
     queryKey: [cUser?.email, "user"],
-    queryFn: async () => {
+    queryFn: async ({ queryKey }) => {
       const responce = await axiosInstance.get(
-        `/get-user?email=${cUser.email}`
+        `/get-user?email=${queryKey[0]}`
       );
       return responce.data;
     },

@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { AuthContext } from "./AuthProvider";
 import Social from "./Social";
 
@@ -12,6 +13,7 @@ const Login = () => {
     try {
       await login(event.target.email.value, event.target.password.value);
       navigate("/dashboard/profile");
+      toast.success("Login");
     } catch (error) {
       console.log(error);
     }

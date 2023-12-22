@@ -18,12 +18,14 @@ const AuthProvider = ({ children }) => {
   const axiosInstance = useAxios();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authReloader, setAuthReloader] = useState(true);
   //! Auth State
   const auth = getAuth(app);
   useEffect(() => {
     const un = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser && currentUser.email) {
         setUser(currentUser);
+        setIsLoading(false);
         console.log(currentUser);
         axiosInstance.put(`/manage-users?email=${currentUser.email}`, {
           name: currentUser.displayName,
@@ -36,7 +38,7 @@ const AuthProvider = ({ children }) => {
       setIsLoading(false);
     });
     return () => un();
-  }, [auth, axiosInstance]);
+  }, [auth, axiosInstance, authReloader]);
   //! Registration
   const registration = (email, password) => {
     setIsLoading(true);
@@ -70,6 +72,8 @@ const AuthProvider = ({ children }) => {
   const authInfo = {
     user,
     isLoading,
+    setAuthReloader,
+    authReloader,
     login,
     registration,
     update,

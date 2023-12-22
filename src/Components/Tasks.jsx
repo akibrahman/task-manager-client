@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { FaPlus, FaRegEdit, FaSpinner, FaTimes } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import Modal from "react-modal";
+import { toast } from "react-toastify";
 import useAxios from "../Hooks/useAxios";
 import useUser from "../Hooks/useUser";
 import { camelCaseToCapitalized } from "../Utils/camelCaseToCapitalized";
@@ -43,6 +44,7 @@ const Tasks = () => {
       reset();
       closeModal();
       setDeadline(null);
+      toast.success("Task Added");
       await refetch();
     } catch (error) {
       console.log(error);
@@ -51,6 +53,7 @@ const Tasks = () => {
 
   const taskDeleter = async (id) => {
     await axiosInstance.delete(`/delete-task?id=${id}`);
+    toast.success("Task Deleted");
     await refetch();
   };
 
@@ -271,6 +274,7 @@ const EditTask = ({
     });
     await refetch();
     await mainRefetch();
+    toast.success("Task Updated");
     closeEditModal();
   };
 
@@ -385,6 +389,7 @@ const SingleBlock = ({
     await refetch();
     window.location.reload();
     setLoading(false);
+    toast.success("Task Status Changed");
   };
 
   return (

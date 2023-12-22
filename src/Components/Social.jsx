@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { AuthContext } from "./AuthProvider";
 
 const Social = () => {
@@ -9,6 +10,7 @@ const Social = () => {
   const handleGoogleLogin = async () => {
     try {
       await google();
+      toast.success("Login");
       navigate("/dashboard/profile");
     } catch (error) {
       console.log(error);

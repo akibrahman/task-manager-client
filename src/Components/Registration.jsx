@@ -1,12 +1,14 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { imageUploader } from "../Utils/imageUploader";
 import { AuthContext } from "./AuthProvider";
 import Social from "./Social";
 
 const Registration = () => {
   const navigate = useNavigate();
-  const { registration, update } = useContext(AuthContext);
+  const { registration, update, authReloader, setAuthReloader } =
+    useContext(AuthContext);
   const [photoFile, setPhotoFile] = useState(null);
 
   const handleRegistration = async (event) => {
@@ -21,6 +23,8 @@ const Registration = () => {
       await registration(form.email.value, form.password.value);
       await update(form.name.value, url.display_url);
       navigate("/dashboard/profile");
+      toast.success("Registered");
+      setAuthReloader(!authReloader);
     } catch (error) {
       console.log(error);
     }
