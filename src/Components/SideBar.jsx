@@ -12,12 +12,12 @@ const SideBar = ({ isOpen, setIsOpen }) => {
         {isOpen ? (
           <FaArrowLeft
             onClick={() => setIsOpen(!isOpen)}
-            className="text-2xl cursor-pointer hover:mr-2 transition-all pointer-events-auto"
+            className="text-2xl cursor-pointer hover:mr-2 transition-all pointer-events-auto hidden md:block"
           />
         ) : (
           <FaBars
             onClick={() => setIsOpen(!isOpen)}
-            className="text-2xl cursor-pointer pointer-events-auto"
+            className="text-2xl cursor-pointer pointer-events-auto hidden md:block"
           />
         )}
         <div className="flex flex-col gap-3 mt-14">

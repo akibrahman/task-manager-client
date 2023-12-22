@@ -10,7 +10,7 @@ const Profile = () => {
   return (
     <div className="flex flex-col items-center justify-center h-[calc(100vh-70px)] w-full">
       <p className="text-6xl mb-14">Profile</p>
-      <div className="flex items-center gap-10">
+      <div className="flex flex-col lg:flex-row items-center gap-10">
         <img
           src={user.photo}
           className="w-[300px] h-[300px] rounded-full"

@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 
@@ -22,8 +23,9 @@ const Social = () => {
         </button> */}
         <button
           onClick={handleGoogleLogin}
-          className="bg-red-500 text-white rounded-md py-2 px-4 hover:bg-red-600"
+          className="bg-red-500 text-white rounded-md py-2 px-4 hover:bg-red-600 flex items-center gap-2 active:scale-90 duration-300"
         >
+          <FaGoogle className="text-xl" />
           Google
         </button>
       </div>

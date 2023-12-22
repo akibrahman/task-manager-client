@@ -91,7 +91,7 @@ const Tasks = () => {
 
   if (!tasks) return <Loader />;
   return (
-    <>
+    <div className="min-h-[calc(100vh-70px)]">
       {/* Add Modal  */}
       <Modal
         overlayClassName="Overlay"
@@ -208,7 +208,7 @@ const Tasks = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mx-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-4 mb-4">
         {statuses.map((status, i) => (
           <SingleBlock
             handleUpdate={handleUpdate}
@@ -222,7 +222,7 @@ const Tasks = () => {
           />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

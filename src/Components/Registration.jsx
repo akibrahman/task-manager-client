@@ -27,8 +27,8 @@ const Registration = () => {
   };
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="flex bg-gray-100 h-[90%]">
-        <div className="w-1/2 bg-white p-10 border border-primary">
+      <div className="flex flex-col md:flex-row bg-gray-100 h-[90%]">
+        <div className="w-full md:w-1/2 bg-white p-10 border border-primary">
           <h1 className="text-2xl font-semibold mb-5">Registration</h1>
           <form onSubmit={handleRegistration}>
             <div className="mb-4">
@@ -111,7 +111,7 @@ const Registration = () => {
           </p>
         </div>
 
-        <div className="w-1/2 bg-primary text-white p-10 border border-primary">
+        <div className="w-full md:w-1/2 bg-primary text-white p-10 border border-primary">
           <p className="text-lg font-semibold mb-5">Welcome!</p>
           <p className="">
             We are very glad to know that we are going to join with a new member

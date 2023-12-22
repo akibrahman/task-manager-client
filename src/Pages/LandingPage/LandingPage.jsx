@@ -1,6 +1,10 @@
+import { useContext } from "react";
 import { SiRundeck } from "react-icons/si";
+import { Link } from "react-router-dom";
+import { AuthContext } from "../../Components/AuthProvider";
 
 const LandingPage = () => {
+  const { user } = useContext(AuthContext);
   const userTypes = [
     {
       title: "Developers",
@@ -33,8 +37,8 @@ const LandingPage = () => {
   ];
   return (
     <div className="">
-      <div className="w-[90%] mx-auto h-[calc(100vh-70px)] flex items-center justify-center">
-        <div className="w-1/2 bg-purple500">
+      <div className="w-[90%] mx-auto h-[calc(100vh-70px)] flex flex-col md:flex-row items-center justify-between md:justify-center my-5 md:my-0">
+        <div className="w-full md:w-1/2 bg-purple500">
           <p className="text-5xl font-semibold">
             Task Management <br /> <span className="text-primary">System</span>
           </p>
@@ -45,11 +49,13 @@ const LandingPage = () => {
             stay organized with a responsive design. Elevate your productivity
             effortlessly.
           </p>
-          <button className="mt-5 bg-primary text-white px-4 py-2 rounded-md font-medium border border-transparent flex items-center gap-3 hover:gap-6 hover:border-primary hover:bg-transparent hover:text-primary hover:scale-105 active:scale-90 ease-in-out duration-300 ">
-            Let&apos;s Explore <SiRundeck />
-          </button>
+          <Link to={`${user ? "/dashboard/profile" : "/login"}`}>
+            <button className="mt-5 bg-primary text-white px-4 py-2 rounded-md font-medium border border-transparent flex items-center gap-3 hover:gap-6 hover:border-primary hover:bg-transparent hover:text-primary hover:scale-105 active:scale-90 ease-in-out duration-300 ">
+              Let&apos;s Explore <SiRundeck />
+            </button>
+          </Link>
         </div>
-        <div className="w-1/2 flex flex-col items-center justify-center gap-6">
+        <div className="w-full md:w-1/2 flex flex-col items-center justify-center gap-6">
           <img className="w-[170px]" src="/b1.gif" alt="" />
           <div className="flex gap-6">
             <img src="/b2.gif" alt="" />
@@ -57,7 +63,7 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
-      <section className="bg-gray-100 py-12">
+      <section className="bg-gray-100 py-12 px-3 md:px-0">
         <div className="container mx-auto">
           <h2 className="text-4xl font-bold mb-8">Who Can Benefit?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
