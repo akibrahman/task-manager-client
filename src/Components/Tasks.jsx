@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { useForm } from "react-hook-form";
@@ -393,7 +394,13 @@ const SingleBlock = ({
   };
 
   return (
-    <div ref={drop} className="">
+    <motion.div
+      initial={{ y: 300 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring" }}
+      ref={drop}
+      className=""
+    >
       <p
         className={`text-center text-white py-2 font-semibold flex items-center justify-center gap-3 ${
           status == "toDo"
@@ -425,7 +432,7 @@ const SingleBlock = ({
         )}
       </div>
       {/*  */}
-    </div>
+    </motion.div>
   );
 };
 //! Single Task -----------------------

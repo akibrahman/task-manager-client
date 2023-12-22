@@ -1,10 +1,17 @@
+import { motion } from "framer-motion";
+
 const About = () => {
   return (
     <section className="bg-gray-200 py-16">
       <div className="container mx-auto flex flex-col items-center">
-        <h2 className="text-5xl font-bold mb-8 text-center">
+        <motion.h2
+          initial={{ x: 300 }}
+          animate={{ x: 0 }}
+          transition={{ type: "spring" }}
+          className="text-5xl font-bold mb-8 text-center"
+        >
           About Our Task Management System
-        </h2>
+        </motion.h2>
         <div className="max-w-3xl mb-8">
           <p className="text-lg text-gray-700 px-10 md:px-0">
             Welcome to our advanced task management system, designed to empower
@@ -21,7 +28,12 @@ const About = () => {
             />
           </div>
           <div className="max-w-xl ml-4">
-            <ul className="list-disc text-lg text-gray-700 px-10 md:px-0">
+            <motion.ul
+              initial={{ x: -300 }}
+              animate={{ x: 0 }}
+              transition={{ type: "spring" }}
+              className="list-disc text-lg text-gray-700 px-10 md:px-0"
+            >
               <li>
                 Intuitive and user-friendly interface for seamless task
                 management.
@@ -40,7 +52,7 @@ const About = () => {
                 Friendly deadline reminders to keep you on track and meet your
                 goals.
               </li>
-            </ul>
+            </motion.ul>
           </div>
         </div>
       </div>

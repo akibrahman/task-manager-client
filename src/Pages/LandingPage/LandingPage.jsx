@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { useContext } from "react";
 import { SiRundeck } from "react-icons/si";
 import { Link } from "react-router-dom";
@@ -38,7 +39,12 @@ const LandingPage = () => {
   return (
     <div className="">
       <div className="w-[90%] mx-auto h-[calc(100vh-70px)] flex flex-col md:flex-row items-center justify-between md:justify-center my-5 md:my-0">
-        <div className="w-full md:w-1/2 bg-purple500">
+        <motion.div
+          initial={{ x: -300 }}
+          animate={{ x: 0 }}
+          transition={{ type: "spring" }}
+          className="w-full md:w-1/2 bg-purple500"
+        >
           <p className="text-5xl font-semibold">
             Task Management <br /> <span className="text-primary">System</span>
           </p>
@@ -54,21 +60,30 @@ const LandingPage = () => {
               Let&apos;s Explore <SiRundeck />
             </button>
           </Link>
-        </div>
-        <div className="w-full md:w-1/2 flex flex-col items-center justify-center gap-6">
+        </motion.div>
+        <motion.div
+          initial={{ x: 300 }}
+          animate={{ x: 0 }}
+          transition={{ type: "spring" }}
+          className="w-full md:w-1/2 flex flex-col items-center justify-center gap-6"
+        >
           <img className="w-[170px]" src="/b1.gif" alt="" />
           <div className="flex gap-6">
             <img src="/b2.gif" alt="" />
             <img src="/b3.gif" alt="" />
           </div>
-        </div>
+        </motion.div>
       </div>
       <section className="bg-gray-100 py-12 px-3 md:px-0">
         <div className="container mx-auto">
           <h2 className="text-4xl font-bold mb-8">Who Can Benefit?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {userTypes.map((userType, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-md">
+              <div
+                data-aos="fade-up"
+                key={index}
+                className="bg-white p-6 rounded-lg shadow-md"
+              >
                 <h3 className="text-xl font-bold mb-4">{userType.title}</h3>
                 <p className="text-gray-700 mb-4">{userType.description}</p>
                 <ul className="list-disc pl-6">

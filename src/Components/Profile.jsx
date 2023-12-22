@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { useContext } from "react";
 import { toast } from "react-toastify";
 import useUser from "../Hooks/useUser";
@@ -12,12 +13,20 @@ const Profile = () => {
     <div className="flex flex-col items-center justify-center h-[calc(100vh-70px)] w-full">
       <p className="text-6xl mb-14">Profile</p>
       <div className="flex flex-col lg:flex-row items-center gap-10">
-        <img
+        <motion.img
+          initial={{ zoom: 0 }}
+          animate={{ zoom: 1 }}
+          transition={{ type: "spring" }}
           src={user?.photo}
           className="w-[300px] h-[300px] rounded-full"
           alt=""
         />
-        <div className="space-y-6">
+        <motion.div
+          initial={{ x: 300 }}
+          animate={{ x: 0 }}
+          transition={{ type: "spring" }}
+          className="space-y-6"
+        >
           <p className="font-bold">
             Name:{" "}
             <span className="font-medium text-white bg-primary px-5 py-2 rounded-md">
@@ -39,7 +48,7 @@ const Profile = () => {
           >
             Logout
           </button>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
