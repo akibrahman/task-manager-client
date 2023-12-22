@@ -1,31 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { useDrag, useDrop } from "react-dnd";
+import { useContext, useState } from "react";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { FaPlus, FaSpinner, FaTimes } from "react-icons/fa";
 import Modal from "react-modal";
 import useAxios from "../Hooks/useAxios";
+import useUser from "../Hooks/useUser";
 import { camelCaseToCapitalized } from "../Utils/camelCaseToCapitalized";
+import { AuthContext } from "./AuthProvider";
 import Loader from "./Loader";
 
 const Tasks = () => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [deadline, setDeadline] = useState();
-  const [loading, setLoading] = useState(false);
   const axiosInstance = useAxios();
+  const { user } = useUser();
+  const { allTasks, dragLoader } = useContext(AuthContext);
   const statuses = ["toDo", "onGoing", "completed"];
-
-  const {
-    data: tasks,
-    isLoading,
-    refetch,
-  } = useQuery({
-    queryKey: ["toDos"],
-    queryFn: async () => {
-      const data = await axiosInstance.get("/get-tasks");
-      return data.data;
-    },
-  });
 
   //!
   const {
@@ -36,13 +26,13 @@ const Tasks = () => {
   } = useForm();
 
   const taskAdder = async (data) => {
-    console.log(data);
+    data = { ...data, user: user.email };
     try {
       await axiosInstance.post("/add-task", data);
       reset();
       closeModal();
       setDeadline(null);
-      await refetch();
+      // await allTasksRefetch();
     } catch (error) {
       console.log(error);
     }
@@ -68,7 +58,7 @@ const Tasks = () => {
     },
   };
 
-  if (isLoading) return <Loader />;
+  if (!allTasks) return <Loader />;
   return (
     <>
       <Modal
@@ -160,13 +150,15 @@ const Tasks = () => {
       </Modal>
       <div>
         <p className="text-lg bg-primary m-4 p-2 text-white flex items-center gap-4">
-          <span
-            onClick={openModal}
-            className="flex items-center gap-3 bg-secondary w-max py-2 px-4 rounded-md cursor-pointer add active:scale-90 duration-300 select-none"
-          >
-            <FaPlus /> Add Task
-          </span>
-          {loading && <FaSpinner className={`animate-spin`} />}
+          {user && (
+            <span
+              onClick={openModal}
+              className="flex items-center gap-3 bg-secondary w-max py-2 px-4 rounded-md cursor-pointer add active:scale-90 duration-300 select-none"
+            >
+              <FaPlus /> Add Task
+            </span>
+          )}
+          {dragLoader && <FaSpinner className={`animate-spin`} />}
         </p>
       </div>
 
@@ -174,10 +166,9 @@ const Tasks = () => {
         {statuses.map((status, i) => (
           <SingleBlock
             axiosInstance={axiosInstance}
-            setLoading={setLoading}
             status={status}
-            refetch={refetch}
-            tasks={tasks}
+            // refetch={allTasksRefetch}
+            tasks={allTasks}
             key={i}
           />
         ))}
@@ -186,78 +177,69 @@ const Tasks = () => {
   );
 };
 //! Single Block -----------------------
-const SingleBlock = ({ status, tasks, setLoading, axiosInstance, refetch }) => {
-  const [, drop] = useDrop(() => ({
-    accept: "TASK",
-    drop: async (item) => await addTaskToSection(item.id, status),
-    // drop: (item) => console.log({ ...item, status }),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-    }),
-  }));
-  //!
-  const addTaskToSection = async (id, status) => {
-    console.log("Dropped - ", id, status);
-    await axiosInstance.put(`/change-task-status?id=${id}`, {
-      status,
-    });
-    await refetch();
-    window.location.reload();
-    setLoading(false);
-  };
-
+const SingleBlock = ({ status, tasks, setLoading }) => {
   return (
-    <div ref={drop} className="">
-      <p
-        className={`text-center text-white py-2 font-semibold flex items-center justify-center gap-3 ${
-          status == "toDo"
-            ? "bg-green-600"
-            : status == "onGoing"
-            ? "bg-yellow-600"
-            : "bg-blue-600"
-        }`}
-      >
-        {camelCaseToCapitalized(status)}
-        <span>{tasks.filter((task) => task.status == status).length}</span>
-      </p>
-      {/*  */}
-      <div className="border border-primary border-t-0 overflow-y-scroll h-[380px]">
-        {tasks.filter((task) => task.status == status).length > 0 ? (
-          tasks
-            .filter((task) => task.status == status)
-            .map((task, i) => (
-              <SingleTask setLoading={setLoading} key={i} task={task} />
-            ))
-        ) : (
-          <p className="pl-5 text-primary py-2 font-semibold">No Tasks Here</p>
-        )}
-      </div>
-      {/*  */}
-    </div>
+    <Droppable droppableId={status}>
+      {(provided) => (
+        <div ref={provided.innerRef} {...provided.droppableProps} className="">
+          <p
+            className={`text-center text-white py-2 font-semibold flex items-center justify-center gap-3 ${
+              status == "toDo"
+                ? "bg-green-600"
+                : status == "onGoing"
+                ? "bg-yellow-600"
+                : "bg-blue-600"
+            }`}
+          >
+            {camelCaseToCapitalized(status)}
+            <span>{tasks.filter((task) => task.status == status).length}</span>
+          </p>
+          {/*  */}
+          <div className="border border-primary border-t-0 overflow-y-scroll h-[380px]">
+            {tasks.filter((task) => task.status == status).length > 0 ? (
+              tasks
+                .filter((task) => task.status == status)
+                .map(
+                  (task, i) =>
+                    task._id && (
+                      <SingleTask
+                        setLoading={setLoading}
+                        key={i}
+                        index={i}
+                        task={task}
+                      />
+                    )
+                )
+            ) : (
+              <p className="pl-5 text-primary py-2 font-semibold">
+                No Tasks Here
+              </p>
+            )}
+            {provided.placeholder}
+          </div>
+          {/*  */}
+        </div>
+      )}
+    </Droppable>
   );
 };
 //! Single Task -----------------------
-const SingleTask = ({ task, setLoading }) => {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: "TASK",
-    item: { id: task._id },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  }));
-  if (isDragging) {
-    setLoading(true);
-  }
+const SingleTask = ({ task, index }) => {
   return (
-    <div
-      onClick={() => console.log(task._id)}
-      ref={drag}
-      className={`p-2 cursor-grab ${isDragging ? "opacity-25" : "opacity-100"}`}
-    >
-      <p className="pl-5 text-primary py-2 font-semibold border border-primary">
-        {task.title}+{task._id}
-      </p>
-    </div>
+    <Draggable draggableId={task._id} index={index}>
+      {(provided) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={`p-2 cursor-grab`}
+        >
+          <p className="pl-5 text-primary py-2 font-semibold border border-primary">
+            {task.title}+{task._id}
+          </p>
+        </div>
+      )}
+    </Draggable>
   );
 };
 

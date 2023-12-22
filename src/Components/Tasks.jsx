@@ -1,20 +1,30 @@
-import { useContext, useState } from "react";
-import { Draggable, Droppable } from "react-beautiful-dnd";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useDrag, useDrop } from "react-dnd";
 import { useForm } from "react-hook-form";
-import { FaPlus, FaSpinner, FaTimes } from "react-icons/fa";
+import { FaPlus, FaRegEdit, FaSpinner, FaTimes } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 import Modal from "react-modal";
 import useAxios from "../Hooks/useAxios";
+import useUser from "../Hooks/useUser";
 import { camelCaseToCapitalized } from "../Utils/camelCaseToCapitalized";
-import { AuthContext } from "./AuthProvider";
 import Loader from "./Loader";
 
 const Tasks = () => {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [deadline, setDeadline] = useState();
+  const [loading, setLoading] = useState(false);
   const axiosInstance = useAxios();
-  const { allTasks, allTasksIsLoading, allTasksRefetch, dragLoader } =
-    useContext(AuthContext);
+  const { user } = useUser();
   const statuses = ["toDo", "onGoing", "completed"];
+
+  const { data: tasks, refetch } = useQuery({
+    queryKey: ["Tasks", user?.email],
+    queryFn: async ({ queryKey }) => {
+      const data = await axiosInstance.get(`/get-tasks?email=${queryKey[1]}`);
+      return data.data;
+    },
+  });
 
   //!
   const {
@@ -25,16 +35,20 @@ const Tasks = () => {
   } = useForm();
 
   const taskAdder = async (data) => {
-    console.log(data);
     try {
-      await axiosInstance.post("/add-task", data);
+      await axiosInstance.post("/add-task", { ...data, user: user.email });
       reset();
       closeModal();
       setDeadline(null);
-      await allTasksRefetch();
+      await refetch();
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const taskDeleter = async (id) => {
+    await axiosInstance.delete(`/delete-task?id=${id}`);
+    await refetch();
   };
 
   const openModal = () => {
@@ -57,7 +71,7 @@ const Tasks = () => {
     },
   };
 
-  if (allTasksIsLoading || !allTasks) return <Loader />;
+  if (!tasks) return <Loader />;
   return (
     <>
       <Modal
@@ -155,17 +169,19 @@ const Tasks = () => {
           >
             <FaPlus /> Add Task
           </span>
-          {dragLoader && <FaSpinner className={`animate-spin`} />}
+          {loading && <FaSpinner className={`animate-spin`} />}
         </p>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mx-4 mb-4">
         {statuses.map((status, i) => (
           <SingleBlock
+            taskDeleter={taskDeleter}
             axiosInstance={axiosInstance}
+            setLoading={setLoading}
             status={status}
-            refetch={allTasksRefetch}
-            tasks={allTasks}
+            refetch={refetch}
+            tasks={tasks}
             key={i}
           />
         ))}
@@ -174,76 +190,95 @@ const Tasks = () => {
   );
 };
 //! Single Block -----------------------
-const SingleBlock = ({ status, tasks, setLoading }) => {
+const SingleBlock = ({
+  status,
+  tasks,
+  setLoading,
+  axiosInstance,
+  refetch,
+  taskDeleter,
+}) => {
+  const [, drop] = useDrop(() => ({
+    accept: "TASK",
+    drop: async (item) => await addTaskToSection(item.id, status),
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
+  }));
+  //!
+  const addTaskToSection = async (id, status) => {
+    console.log("Dropped - ", id, status);
+    await axiosInstance.put(`/change-task-status?id=${id}`, {
+      status,
+    });
+    await refetch();
+    window.location.reload();
+    setLoading(false);
+  };
+
   return (
-    <Droppable droppableId={status}>
-      {(provided) => (
-        <div ref={provided.innerRef} {...provided.droppableProps} className="">
-          <p
-            className={`text-center text-white py-2 font-semibold flex items-center justify-center gap-3 ${
-              status == "toDo"
-                ? "bg-green-600"
-                : status == "onGoing"
-                ? "bg-yellow-600"
-                : "bg-blue-600"
-            }`}
-          >
-            {camelCaseToCapitalized(status)}
-            <span>{tasks.filter((task) => task.status == status).length}</span>
-          </p>
-          {/*  */}
-          <div className="border border-primary border-t-0 overflow-y-scroll h-[380px]">
-            {tasks.filter((task) => task.status == status).length > 0 ? (
-              tasks
-                .filter((task) => task.status == status)
-                .map((task, i) => (
-                  <SingleTask
-                    setLoading={setLoading}
-                    key={i}
-                    index={i}
-                    task={task}
-                  />
-                ))
-            ) : (
-              <p className="pl-5 text-primary py-2 font-semibold">
-                No Tasks Here
-              </p>
-            )}
-            {provided.placeholder}
-          </div>
-          {/*  */}
-        </div>
-      )}
-    </Droppable>
+    <div ref={drop} className="">
+      <p
+        className={`text-center text-white py-2 font-semibold flex items-center justify-center gap-3 ${
+          status == "toDo"
+            ? "bg-green-600"
+            : status == "onGoing"
+            ? "bg-yellow-600"
+            : "bg-blue-600"
+        }`}
+      >
+        {camelCaseToCapitalized(status)}
+        <span>{tasks.filter((task) => task.status == status).length}</span>
+      </p>
+      {/*  */}
+      <div className="border border-primary border-t-0 overflow-y-scroll h-[380px]">
+        {tasks.filter((task) => task.status == status).length > 0 ? (
+          tasks
+            .filter((task) => task.status == status)
+            .map((task, i) => (
+              <SingleTask
+                taskDeleter={taskDeleter}
+                setLoading={setLoading}
+                key={i}
+                task={task}
+              />
+            ))
+        ) : (
+          <p className="pl-5 text-primary py-2 font-semibold">No Tasks Here</p>
+        )}
+      </div>
+      {/*  */}
+    </div>
   );
 };
 //! Single Task -----------------------
-const SingleTask = ({ task, index }) => {
-  // const [{ isDragging }, drag] = useDrag(() => ({
-  //   type: "TASK",
-  //   item: { id: task._id },
-  //   collect: (monitor) => ({
-  //     isDragging: !!monitor.isDragging(),
-  //   }),
-  // }));
-  // if (isDragging) {
-  //   setLoading(true);
-  // }
+const SingleTask = ({ task, setLoading, taskDeleter }) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "TASK",
+    item: { id: task._id },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
+  if (isDragging) {
+    setLoading(true);
+  }
   return (
-    <Draggable draggableId={task._id} index={index}>
-      {(provided) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          className={`p-2 cursor-grab`}
-        >
-          <p className="pl-5 text-primary py-2 font-semibold border border-primary">
-            {task.title}+{task._id}
-          </p>
+    <div
+      ref={drag}
+      className={`p-2 cursor-grab ${isDragging ? "opacity-25" : "opacity-100"}`}
+    >
+      <p className="pl-5 text-primary py-2 font-semibold border border-primary flex items-center justify-between">
+        {task.title}
+        <div className="flex items-center gap-2">
+          <FaRegEdit className="text-xl text-orange-500 mr-2" />
+          <MdDelete
+            onClick={() => taskDeleter(task._id)}
+            className="text-xl text-red-500 mr-2 cursor-pointer"
+          />
         </div>
-      )}
-    </Draggable>
+      </p>
+    </div>
   );
 };
 
