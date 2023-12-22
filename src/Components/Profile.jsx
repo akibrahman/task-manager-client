@@ -1,10 +1,12 @@
 import { useContext } from "react";
 import useUser from "../Hooks/useUser";
 import { AuthContext } from "./AuthProvider";
+import Loader from "./Loader";
 
 const Profile = () => {
   const { logout } = useContext(AuthContext);
   const { user } = useUser();
+  if (!user) return <Loader />;
   return (
     <div className="flex flex-col items-center justify-center h-[calc(100vh-70px)] w-full">
       <p className="text-6xl mb-14">Profile</p>

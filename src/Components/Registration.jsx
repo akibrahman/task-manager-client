@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { imageUploader } from "../Utils/imageUploader";
 import { AuthContext } from "./AuthProvider";
+import Social from "./Social";
 
 const Registration = () => {
   const navigate = useNavigate();
@@ -111,22 +112,11 @@ const Registration = () => {
         </div>
 
         <div className="w-1/2 bg-primary text-white p-10 border border-primary">
-          <p className="text-lg font-semibold mb-5">Welcome Back!</p>
+          <p className="text-lg font-semibold mb-5">Welcome!</p>
           <p className="">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vel
-            neque justo.
+            We are very glad to know that we are going to join with a new member
           </p>
-          <div className="mt-8">
-            <p className="mb-2">Login with social accounts:</p>
-            <div className="flex space-x-4">
-              <button className="bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600">
-                Facebook
-              </button>
-              <button className="bg-red-500 text-white rounded-md py-2 px-4 hover:bg-red-600">
-                Google
-              </button>
-            </div>
-          </div>
+          <Social />
         </div>
       </div>
     </div>
