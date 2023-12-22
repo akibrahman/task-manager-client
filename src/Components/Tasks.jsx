@@ -11,8 +11,11 @@ import { camelCaseToCapitalized } from "../Utils/camelCaseToCapitalized";
 import Loader from "./Loader";
 
 const Tasks = () => {
-  const [modalIsOpen, setIsOpen] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [editModalIsOpen, setEditModalIsOpen] = useState(false);
+  const [EditTaskId, setEditTaskId] = useState();
   const [deadline, setDeadline] = useState();
+
   const [loading, setLoading] = useState(false);
   const axiosInstance = useAxios();
   const { user } = useUser();
@@ -51,11 +54,26 @@ const Tasks = () => {
     await refetch();
   };
 
+  const taskUpdater = (data) => {
+    console.log(data);
+  };
+  const handleUpdate = async (id) => {
+    setEditTaskId(id);
+    openEditModal();
+  };
+
   const openModal = () => {
-    setIsOpen(true);
+    setModalIsOpen(true);
+  };
+  const openEditModal = () => {
+    setEditModalIsOpen(true);
   };
   const closeModal = () => {
-    setIsOpen(false);
+    setModalIsOpen(false);
+  };
+  const closeEditModal = () => {
+    setEditModalIsOpen(false);
+    console.log("Editing Sesh");
   };
   const customStyles = {
     content: {
@@ -74,6 +92,7 @@ const Tasks = () => {
   if (!tasks) return <Loader />;
   return (
     <>
+      {/* Add Modal  */}
       <Modal
         overlayClassName="Overlay"
         isOpen={modalIsOpen}
@@ -161,6 +180,22 @@ const Tasks = () => {
         </form>
         {/* </div> */}
       </Modal>
+      {/* Edit Modal  */}
+      <Modal
+        overlayClassName="Overlay"
+        isOpen={editModalIsOpen}
+        onRequestClose={closeEditModal}
+        style={customStyles}
+        contentLabel="Edit Modal"
+      >
+        <EditTask
+          mainRefetch={refetch}
+          taskUpdater={taskUpdater}
+          closeEditModal={closeEditModal}
+          EditTaskId={EditTaskId}
+          axiosInstance={axiosInstance}
+        />
+      </Modal>
       <div>
         <p className="text-lg bg-primary m-4 p-2 text-white flex items-center gap-4">
           <span
@@ -176,6 +211,7 @@ const Tasks = () => {
       <div className="grid grid-cols-3 gap-4 mx-4 mb-4">
         {statuses.map((status, i) => (
           <SingleBlock
+            handleUpdate={handleUpdate}
             taskDeleter={taskDeleter}
             axiosInstance={axiosInstance}
             setLoading={setLoading}
@@ -189,9 +225,144 @@ const Tasks = () => {
     </>
   );
 };
+
+//! Edit Task-------------------------
+const EditTask = ({
+  closeEditModal,
+  EditTaskId = "a",
+  axiosInstance,
+  mainRefetch,
+}) => {
+  // const [editData, setEditData] = useState();
+  const [newDeadline, setNewDeadline] = useState();
+  const {
+    register,
+    // reset,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  //!
+  const {
+    data: editData,
+    // isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["my-review", EditTaskId],
+    queryFn: async ({ queryKey }) => {
+      const { data } = await axiosInstance.get(`/get-task?id=${queryKey[1]}`);
+      // openEditModal();
+      return data;
+    },
+  });
+
+  const taskUpdater = async (data) => {
+    if (
+      !newDeadline &&
+      data.title == editData.title &&
+      data.description == editData.description &&
+      data.priority == editData.priority
+    ) {
+      alert("No Change");
+      return;
+    }
+    await axiosInstance.patch(`/edit-task?id=${EditTaskId}`, {
+      ...data,
+      deadline: newDeadline ? newDeadline : editData.deadline,
+    });
+    await refetch();
+    await mainRefetch();
+    closeEditModal();
+  };
+
+  return (
+    <>
+      <h2 className="text-2xl font-semibold mb-4 flex items-center justify-between">
+        Edit Task{" "}
+        <FaTimes onClick={closeEditModal} className="cursor-pointer" />
+      </h2>
+      {editData && (
+        <form onSubmit={handleSubmit(taskUpdater)}>
+          <div className="mb-4">
+            <label htmlFor="title" className="block text-sm font-medium">
+              Title
+            </label>
+            <input
+              {...register("title", { required: true })}
+              type="text"
+              defaultValue={editData.title}
+              className="mt-1 p-2 w-80 border rounded-md text-primary"
+              placeholder="Enter Title"
+            />
+            {errors.title?.type === "required" && (
+              <p className="text-red-600 mt-1">Title is required</p>
+            )}
+          </div>
+          <div className="mb-4">
+            <label htmlFor="description" className="block text-sm font-medium">
+              Description
+            </label>
+            <textarea
+              {...register("description", { required: true })}
+              className="mt-1 p-2 w-80 border rounded-md text-primary"
+              rows="3"
+              defaultValue={editData.description}
+              placeholder="Enter Description"
+            ></textarea>
+            {errors.description?.type === "required" && (
+              <p className="text-red-600">First name is required</p>
+            )}
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium">
+              Prev Deadline - {editData.deadline.split("T")[0]}
+            </label>
+            <label htmlFor="deadline" className="block text-sm font-medium">
+              Set New Deadline
+            </label>
+            <input
+              {...register("deadline", { required: false })}
+              type="date"
+              value={newDeadline}
+              onChange={(e) => setNewDeadline(e.target.value)}
+              className="mt-1 p-2 w-80 border rounded-md text-primary"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="priority" className="block text-sm font-medium">
+              Priority
+            </label>
+            <select
+              {...register("priority", { required: true })}
+              defaultValue={editData.priority}
+              // onChange={(e) => setPriority(e.target.value)}
+              className="mt-1 p-2 w-80 border rounded-md text-primary"
+            >
+              <option value="" disabled>
+                Select Priority
+              </option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+            {errors.priority?.type === "required" && (
+              <p className="text-red-600">Priority is required</p>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            Add Task
+          </button>
+        </form>
+      )}
+    </>
+  );
+};
 //! Single Block -----------------------
 const SingleBlock = ({
   status,
+  handleUpdate,
   tasks,
   setLoading,
   axiosInstance,
@@ -237,6 +408,7 @@ const SingleBlock = ({
             .filter((task) => task.status == status)
             .map((task, i) => (
               <SingleTask
+                handleUpdate={handleUpdate}
                 taskDeleter={taskDeleter}
                 setLoading={setLoading}
                 key={i}
@@ -252,7 +424,7 @@ const SingleBlock = ({
   );
 };
 //! Single Task -----------------------
-const SingleTask = ({ task, setLoading, taskDeleter }) => {
+const SingleTask = ({ task, setLoading, taskDeleter, handleUpdate }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TASK",
     item: { id: task._id },
@@ -268,16 +440,30 @@ const SingleTask = ({ task, setLoading, taskDeleter }) => {
       ref={drag}
       className={`p-2 cursor-grab ${isDragging ? "opacity-25" : "opacity-100"}`}
     >
-      <p className="pl-5 text-primary py-2 font-semibold border border-primary flex items-center justify-between">
-        {task.title}
+      <div className="pl-5 text-primary py-2 font-semibold border border-primary flex items-center justify-between">
+        <div className="">
+          <div className="flex items-center gap-3">
+            <p className="min-w-[120px]"> {task.title}</p>
+            <p className="text-white bg-primary w-max text-sm px-2 py-1 rounded-full">
+              {task.priority}
+            </p>
+          </div>
+          <p className="mt-2">
+            {/* Deadline: {moment(task.deadline).format("do-MMMM")} */}
+            Deadline: {task.deadline.split("T")[0]}
+          </p>
+        </div>
         <div className="flex items-center gap-2">
-          <FaRegEdit className="text-xl text-orange-500 mr-2" />
+          <FaRegEdit
+            onClick={() => handleUpdate(task._id)}
+            className="text-xl text-orange-500 mr-2 cursor-pointer"
+          />
           <MdDelete
             onClick={() => taskDeleter(task._id)}
             className="text-xl text-red-500 mr-2 cursor-pointer"
           />
         </div>
-      </p>
+      </div>
     </div>
   );
 };
