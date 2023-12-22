@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="bg-gray-800 text-white pt-12">
       <div className="container mx-auto flex flex-wrap justify-between items-center">
         {/* Social Media Links */}
-        <div className="mb-8">
+        <div className="mb-8 mx-auto">
           <h3 className="text-2xl font-bold mb-4">Connect with us</h3>
           <div className="flex space-x-4">
             <Link
@@ -41,7 +41,7 @@ const Footer = () => {
         </div>
 
         {/* Subscription Field */}
-        <div className="mb-8">
+        <div className="mb-8 mx-auto">
           <h3 className="text-2xl font-bold mb-4">
             Subscribe to our newsletter
           </h3>
@@ -58,24 +58,24 @@ const Footer = () => {
         </div>
 
         {/* Navigation Links */}
-        <div>
+        <div className="mx-auto">
           <h3 className="text-2xl font-bold mb-4">Quick Links</h3>
-          <ul className="space-y-2">
+          <ul className="flex flex-col items-center gap-3">
             <li>
-              <a
-                href="#"
+              <Link
+                to="/"
                 className="hover:text-gray-400 transition duration-300"
               >
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to="/about"
                 className="hover:text-gray-400 transition duration-300"
               >
                 About
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
