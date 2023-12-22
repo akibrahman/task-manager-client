@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -7,6 +8,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
+import { DragDropContext } from "react-beautiful-dnd";
 import { app } from "../../firebase.config";
 import useAxios from "../Hooks/useAxios";
 
@@ -16,6 +18,7 @@ const AuthProvider = ({ children }) => {
   const axiosInstance = useAxios();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [dragLoader, setDragLoader] = useState(false);
   //! Auth State
   const auth = getAuth(app);
   useEffect(() => {
@@ -58,6 +61,28 @@ const AuthProvider = ({ children }) => {
     setIsLoading(true);
     return signOut(auth);
   };
+  //! Task Loader
+  const {
+    data: allTasks,
+    isLoading: allTasksIsLoading,
+    refetch: allTasksRefetch,
+  } = useQuery({
+    queryKey: ["Tasks"],
+    queryFn: async () => {
+      const data = await axiosInstance.get("/get-tasks");
+      return data.data;
+    },
+  });
+  //! Drag Handler
+  const handleDragging = async (result) => {
+    setDragLoader(true);
+    console.log(result.draggableId, result.destination.droppableId);
+    await axiosInstance.put(`/change-task-status?id=${result.draggableId}`, {
+      status: result.destination.droppableId,
+    });
+    await allTasksRefetch();
+    setDragLoader(false);
+  };
   //! Passing All
   const authInfo = {
     user,
@@ -66,9 +91,16 @@ const AuthProvider = ({ children }) => {
     registration,
     update,
     logout,
+    //!
+    dragLoader,
+    allTasks,
+    allTasksIsLoading,
+    allTasksRefetch,
   };
   return (
-    <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>
+    <DragDropContext onDragEnd={handleDragging}>
+      <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>{" "}
+    </DragDropContext>
   );
 };
 

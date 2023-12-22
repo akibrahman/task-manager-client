@@ -4,6 +4,7 @@ import SideBar from "../../Components/SideBar";
 
 const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className="relative flex h-full">
       <div className={`${isOpen ? "w-[220px]" : "w-[60px]"}   transition-all`}>

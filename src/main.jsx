@@ -10,10 +10,10 @@ const tanstack = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AuthProvider>
-      <QueryClientProvider client={tanstack}>
+    <QueryClientProvider client={tanstack}>
+      <AuthProvider>
         <RouterProvider router={routes} />
-      </QueryClientProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
