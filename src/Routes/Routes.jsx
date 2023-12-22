@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
+import About from "../Components/About";
 import Login from "../Components/Login";
 import Profile from "../Components/Profile";
 import Registration from "../Components/Registration";
@@ -16,6 +17,10 @@ export const routes = createBrowserRouter([
       {
         path: "/",
         element: <LandingPage />,
+      },
+      {
+        path: "/about",
+        element: <About />,
       },
       {
         path: "/dashboard",
