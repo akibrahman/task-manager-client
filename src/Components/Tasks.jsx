@@ -18,15 +18,19 @@ const Tasks = () => {
   const [EditTaskId, setEditTaskId] = useState();
   const [deadline, setDeadline] = useState();
 
+  const [tasks, setTasks] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const axiosInstance = useAxios();
   const { user } = useUser();
   const statuses = ["toDo", "onGoing", "completed"];
 
-  const { data: tasks, refetch } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ["Tasks", user?.email],
     queryFn: async ({ queryKey }) => {
+      setTasks([]);
       const data = await axiosInstance.get(`/get-tasks?email=${queryKey[1]}`);
+      setTasks(data.data);
       return data.data;
     },
   });
@@ -388,7 +392,7 @@ const SingleBlock = ({
       status,
     });
     await refetch();
-    window.location.reload();
+    // window.location.reload();
     setLoading(false);
     toast.success("Task Status Changed");
   };
